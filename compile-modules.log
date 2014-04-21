@@ -1,0 +1,88 @@
+  CHK     include/linux/version.h
+  CHK     include/generated/utsrelease.h
+make[1]: `include/generated/mach-types.h' is up to date.
+  CALL    scripts/checksyscalls.sh
+  CC [M]  arch/arm/mach-msm/dma_test.o
+  CC [M]  drivers/media/common/tuners/tuner-xc2028.o
+  CC [M]  drivers/media/common/tuners/tuner-simple.o
+  CC [M]  drivers/media/common/tuners/tuner-types.o
+  CC [M]  drivers/media/common/tuners/mt20xx.o
+  CC [M]  drivers/scsi/scsi_wait_scan.o
+  CC [M]  drivers/media/common/tuners/tda8290.o
+  CC [M]  drivers/media/common/tuners/tea5767.o
+  CC [M]  drivers/media/common/tuners/tea5761.o
+  CC [M]  drivers/media/common/tuners/tda9887.o
+  CC [M]  drivers/media/common/tuners/tda827x.o
+  CC [M]  drivers/media/common/tuners/tda18271-maps.o
+  CC [M]  drivers/media/video/gspca/gspca.o
+  CC [M]  drivers/media/common/tuners/tda18271-common.o
+  CC [M]  drivers/media/common/tuners/tda18271-fe.o
+  CC [M]  drivers/media/common/tuners/xc5000.o
+  CC [M]  drivers/media/common/tuners/xc4000.o
+  CC [M]  drivers/media/common/tuners/mt2060.o
+  CC [M]  drivers/media/common/tuners/mt2063.o
+  CC [M]  drivers/media/common/tuners/mt2266.o
+  LD [M]  drivers/media/video/gspca/gspca_main.o
+  CC [M]  drivers/media/common/tuners/qt1010.o
+  CC [M]  drivers/media/common/tuners/mt2131.o
+  CC [M]  drivers/media/common/tuners/mxl5005s.o
+  CC [M]  drivers/media/common/tuners/mxl5007t.o
+  CC [M]  drivers/media/common/tuners/mc44s803.o
+  CC [M]  drivers/media/common/tuners/max2165.o
+  CC [M]  drivers/media/common/tuners/tda18218.o
+  CC [M]  drivers/media/common/tuners/tda18212.o
+  LD [M]  drivers/media/common/tuners/tda18271.o
+  Building modules, stage 2.
+  MODPOST 26 modules
+  CC      arch/arm/mach-msm/dma_test.mod.o
+  CC      drivers/media/common/tuners/max2165.mod.o
+  CC      drivers/media/common/tuners/mc44s803.mod.o
+  CC      drivers/media/common/tuners/mt2060.mod.o
+  CC      drivers/media/common/tuners/mt2063.mod.o
+  CC      drivers/media/common/tuners/mt20xx.mod.o
+  CC      drivers/media/common/tuners/mt2131.mod.o
+  CC      drivers/media/common/tuners/mt2266.mod.o
+  CC      drivers/media/common/tuners/mxl5005s.mod.o
+  CC      drivers/media/common/tuners/mxl5007t.mod.o
+  CC      drivers/media/common/tuners/qt1010.mod.o
+  CC      drivers/media/common/tuners/tda18212.mod.o
+  CC      drivers/media/common/tuners/tda18218.mod.o
+  CC      drivers/media/common/tuners/tda18271.mod.o
+  CC      drivers/media/common/tuners/tda827x.mod.o
+  CC      drivers/media/common/tuners/tda8290.mod.o
+  CC      drivers/media/common/tuners/tda9887.mod.o
+  CC      drivers/media/common/tuners/tea5761.mod.o
+  CC      drivers/media/common/tuners/tea5767.mod.o
+  CC      drivers/media/common/tuners/tuner-simple.mod.o
+  CC      drivers/media/common/tuners/tuner-types.mod.o
+  CC      drivers/media/common/tuners/tuner-xc2028.mod.o
+  CC      drivers/media/common/tuners/xc4000.mod.o
+  CC      drivers/media/common/tuners/xc5000.mod.o
+  CC      drivers/scsi/scsi_wait_scan.mod.o
+  LD [M]  arch/arm/mach-msm/dma_test.ko
+  LD [M]  drivers/media/common/tuners/max2165.ko
+  CC      drivers/media/video/gspca/gspca_main.mod.o
+  LD [M]  drivers/media/common/tuners/mc44s803.ko
+  LD [M]  drivers/media/common/tuners/mt2060.ko
+  LD [M]  drivers/media/common/tuners/mt2063.ko
+  LD [M]  drivers/media/common/tuners/mt20xx.ko
+  LD [M]  drivers/media/common/tuners/mt2131.ko
+  LD [M]  drivers/media/common/tuners/mt2266.ko
+  LD [M]  drivers/media/common/tuners/mxl5005s.ko
+  LD [M]  drivers/media/common/tuners/mxl5007t.ko
+  LD [M]  drivers/media/common/tuners/qt1010.ko
+  LD [M]  drivers/media/common/tuners/tda18212.ko
+  LD [M]  drivers/media/common/tuners/tda18218.ko
+  LD [M]  drivers/media/common/tuners/tda18271.ko
+  LD [M]  drivers/media/common/tuners/tda827x.ko
+  LD [M]  drivers/media/common/tuners/tda8290.ko
+  LD [M]  drivers/media/common/tuners/tda9887.ko
+  LD [M]  drivers/media/common/tuners/tea5761.ko
+  LD [M]  drivers/media/common/tuners/tea5767.ko
+  LD [M]  drivers/media/common/tuners/tuner-simple.ko
+  LD [M]  drivers/media/common/tuners/tuner-types.ko
+  LD [M]  drivers/media/common/tuners/tuner-xc2028.ko
+  LD [M]  drivers/media/common/tuners/xc4000.ko
+  LD [M]  drivers/media/common/tuners/xc5000.ko
+  LD [M]  drivers/media/video/gspca/gspca_main.ko
+  LD [M]  drivers/scsi/scsi_wait_scan.ko
