@@ -527,6 +527,85 @@ if(mdp_reg_dump_en){
 	pr_debug("total mdp regs: %d\n",mdp_reg_count);
 }
 
+/*      		MDP_STATS_MAGIC+0:
+                        intf: inf_num play_cnt vsync_cnt underrun_cnt
+                        MDP_STATS_MAGIC+1:
+                        wb:   mode play_cnt
+                        MDP_STATS_MAGIC+2:
+                        vig_pipe interrupt cnt
+                        MDP_STATS_MAGIC+3:
+                        rgb_pipe interrupt cnt
+                        MDP_STATS_MAGIC+4:
+                        dma_pipe interrupt cnt                          		*/
+#ifdef __KERNEL__
+void dump_mdp_stats(void)
+{
+	int i;
+	static u32 *buff = NULL;
+	struct mdss_data_type *mdata = mdss_mdp_get_mdata();
+	if(mdata != NULL){
+		if(debug_mdp && buff == NULL){
+                buff = (u32 *)((char *)debug_mdp + (sizeof(struct debug_mdp) + debug_mdp->mdp_stats.offset));
+        	}
+        	else if(!debug_mdp){
+                	pr_info("Debug module not Initialized\n");
+                	return ;
+        	}	
+		pr_info("KK: (%s)::>> debug_mdp->mdp_stats.last = %x\n", __func__, debug_mdp->mdp_stats.last);
+		debug_mdp->mdp_stats.last = debug_mdp->mdp_stats.first;
+		for(i = 0; i < mdata->nctl; i++){
+			if((mdata->ctl_off+i)->intf_num){
+				buff[debug_mdp->mdp_stats.last++] = START_MAGIC+0;
+				buff[debug_mdp->mdp_stats.last++] = (mdata->ctl_off+i)->intf_num;
+				buff[debug_mdp->mdp_stats.last++] = (mdata->ctl_off+i)->play_cnt;
+				buff[debug_mdp->mdp_stats.last++] = (mdata->ctl_off+i)->vsync_cnt;
+				buff[debug_mdp->mdp_stats.last++] = (mdata->ctl_off+i)->underrun_cnt;
+			}
+			else{
+				buff[debug_mdp->mdp_stats.last++] = START_MAGIC+1;
+				buff[debug_mdp->mdp_stats.last++] = (mdata->ctl_off+i)->opmode;
+				buff[debug_mdp->mdp_stats.last++] = (mdata->ctl_off+i)->play_cnt;
+			}
+		}
+		for(i = 0; i < mdata->nvig_pipes; i++){
+			buff[debug_mdp->mdp_stats.last++] = START_MAGIC+2;
+			buff[debug_mdp->mdp_stats.last++] = (mdata->vig_pipes+i)->play_cnt;
+		}
+		for(i = 0; i < mdata->nrgb_pipes; i++){
+			buff[debug_mdp->mdp_stats.last++] = START_MAGIC+3;
+                        buff[debug_mdp->mdp_stats.last++] = (mdata->rgb_pipes+i)->play_cnt;
+		}
+		for(i = 0; i < mdata->ndma_pipes; i++){
+			buff[debug_mdp->mdp_stats.last++] = START_MAGIC+4;
+                        buff[debug_mdp->mdp_stats.last++] = (mdata->dma_pipes+i)->play_cnt;
+		}
+	}
+	else{
+		pr_info("mdata not initialized\n");
+		return;
+	}
+}
+
+void dump_overlay_stats(void)
+{
+	static u32 *buff = NULL;
+	struct msm_mdp_interface *mdp_instance = &mdp5;
+	struct mdss_overlay_private *mdp5_data;
+
+	mdp5_data = (struct mdss_overlay_private *)(mdp_instance->private1);
+	if(debug_mdp && buff == NULL)
+		buff = (u32 *)((char *)debug_mdp + (sizeof(struct debug_mdp) + debug_mdp->overlay_stats.offset));
+	else if(!debug_mdp){
+		pr_info("Debug module not Initialized\n");
+                return ;
+	}
+	pr_info("KK: -----------> (%s)::>>> %p\n", __func__, mdp5_data);
+	debug_mdp->overlay_stats.last = debug_mdp->overlay_stats.first;
+	buff[debug_mdp->overlay_stats.last++] = START_MAGIC;
+	/* --------------------------------
+		dump whatever is needed from mdp5_data here
+	---------------------------------------*/
+}
 void dlog(struct _dlogdebug *desc, ...)
 {	
 	
