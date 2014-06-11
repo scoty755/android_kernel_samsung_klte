@@ -1,16 +1,23 @@
 #!/bin/sh
-export PLATFORM="TW"
+export PLATFORM="AOSP"
 export MREV="KK4.4"
 export CURDATE=`date "+%m.%d.%Y"`
-export MUXEDNAMELONG="KT-SGS5-$MREV-$PLATFORM-$CARRIER-$CURDATE"
-export MUXEDNAMESHRT="KT-SGS5-$MREV-$PLATFORM-$CARRIER*"
-export KTVER="--$MUXEDNAMELONG--"
+if [ "$RLSVER" != "" ]; then
+export MUXEDNAMELONG="ChronicKernel-$MREV-$PLATFORM-$CARRIER-$RLSVER"
+else
+export MUXEDNAMELONG="ChronicKernel-$MREV-$PLATFORM-$CARRIER-$CURDATE"
+fi
+export MUXEDNAMESHRT="ChronicKernel-$MREV-$PLATFORM-$CARRIER*"
+export KTVER="-$MUXEDNAMELONG"
+export SRC_ROOT=`readlink -f ../../..`
 export KERNELDIR=`readlink -f .`
 export PARENT_DIR=`readlink -f ..`
 export INITRAMFS_DEST=$KERNELDIR/kernel/usr/initramfs
-export INITRAMFS_SOURCE=`readlink -f ..`/Ramdisks/$PLATFORM"_"$CARRIER"4.4"
+export INITRAMFS_SOURCE=`readlink -f ..`/Ramdisks/$PLATFORM"_CM-"$MREV
 export CONFIG_$PLATFORM_BUILD=y
-export PACKAGEDIR=$PARENT_DIR/Packages/$PLATFORM
+export PACKAGEDIR=$KERNELDIR/Packages/$PLATFORM
+# enable ccache
+export USE_CCACHE=1
 #Enable FIPS mode
 #export USE_SEC_FIPS_MODE=true
 export ARCH=arm
@@ -21,29 +28,26 @@ export ENABLE_GRAPHITE=true
 time_start=$(date +%s.%N)
 
 echo "Remove old Package Files"
-rm -rf $PACKAGEDIR/*
+rm -rf $PACKAGEDIR/* > /dev/null 2>&1
 
 echo "Setup Package Directory"
-mkdir -p $PACKAGEDIR/system/app
 mkdir -p $PACKAGEDIR/system/lib/modules
-mkdir -p $PACKAGEDIR/system/etc/init.d
 
 echo "Create initramfs dir"
 mkdir -p $INITRAMFS_DEST
 
 echo "Remove old initramfs dir"
-rm -rf $INITRAMFS_DEST/*
+rm -rf $INITRAMFS_DEST/* > /dev/null 2>&1
 
 echo "Copy new initramfs dir"
 cp -R $INITRAMFS_SOURCE/* $INITRAMFS_DEST
 
 echo "chmod initramfs dir"
 chmod -R g-w $INITRAMFS_DEST/*
-rm $(find $INITRAMFS_DEST -name EMPTY_DIRECTORY -print)
+rm $(find $INITRAMFS_DEST -name EMPTY_DIRECTORY -print) > /dev/null 2>&1
 rm -rf $(find $INITRAMFS_DEST -name .git -print)
 
 echo "Remove old zImage"
-rm $PACKAGEDIR/zImage
 rm arch/arm/boot/zImage
 rm arch/arm/boot/zImage-dtb
 
@@ -52,11 +56,15 @@ echo "Make the kernel"
 make msm8974_sec_defconfig VARIANT_DEFCONFIG=msm8974pro_sec_klte_eur_defconfig SELINUX_DEFCONFIG=selinux_defconfig
 
 echo "Modding .config file - "$KTVER
-sed -i 's,CONFIG_LOCALVERSION="-KT-SGS5",CONFIG_LOCALVERSION="'$KTVER'",' .config
+sed -i 's,CONFIG_LOCALVERSION="-ChronicKernel-linaro",CONFIG_LOCALVERSION="'$KTVER'",' .config
+if [ "$RLSVER" != "" ]; then
+echo "Release version number set - disabling LOCALVERSION_AUTO"
+sed -i 's,CONFIG_LOCALVERSION_AUTO=y,# CONFIG_LOCALVERSION_AUTO is not set,' .config
+fi
 
 HOST_CHECK=`uname -n`
-if [ $HOST_CHECK = 'ktoonsez-VirtualBox' ] || [ $HOST_CHECK = 'task650-Underwear' ]; then
-	echo "Ktoonsez/task650 24!"
+if [ $HOST_CHECK = 'chronic-buildbox' ]; then
+	echo "detected build server...running make with 24 jobs"
 	make -j24
 else
 	echo "Others! - " + $HOST_CHECK
@@ -65,9 +73,8 @@ fi;
 
 echo "Copy modules to Package"
 cp -a $(find . -name *.ko -print |grep -v initramfs) $PACKAGEDIR/system/lib/modules/
-if [ $ADD_KTWEAKER = 'Y' ]; then
-	cp /home/ktoonsez/workspace/com.ktoonsez.KTweaker.apk $PACKAGEDIR/system/app/com.ktoonsez.KTweaker.apk
-	cp /home/ktoonsez/workspace/com.ktoonsez.KTmonitor.apk $PACKAGEDIR/system/app/com.ktoonsez.KTmonitor.apk
+if [ $ADD_CHRONIC_CONFIG = 'Y' ]; then
+	cp Packages/chronic-config.sh $PACKAGEDIR/system/etc/chronic-config.sh
 fi;
 
 if [ -e $KERNELDIR/arch/arm/boot/zImage ]; then
@@ -84,31 +91,16 @@ if [ -e $KERNELDIR/arch/arm/boot/zImage ]; then
 
 	rm ramdisk.gz
 	rm zImage
-	rm ../$MUXEDNAMESHRT.zip
+	rm ../$MUXEDNAMESHRT.zip > /dev/null 2>&1
 	zip -r ../$MUXEDNAMELONG.zip .
 
 	time_end=$(date +%s.%N)
 	echo -e "${BLDYLW}Total time elapsed: ${TCTCLR}${TXTGRN}$(echo "($time_end - $time_start) / 60"|bc ) ${TXTYLW}minutes${TXTGRN} ($(echo "$time_end - $time_start"|bc ) ${TXTYLW}seconds) ${TXTCLR}"
 
-	export DLNAME="http://ktoonsez.jonathanjsimon.com/sgs5/$PLATFORM/$MUXEDNAMELONG.zip"
-	
 	FILENAME=../$MUXEDNAMELONG.zip
 	FILESIZE=$(stat -c%s "$FILENAME")
 	echo "Size of $FILENAME = $FILESIZE bytes."
-	rm ../$MREV-$PLATFORM-$CARRIER"-version.txt"
-	exec 1>>../$MREV-$PLATFORM-$CARRIER"-version.txt" 2>&1
-	echo -n "$MUXEDNAMELONG,$FILESIZE," & curl -s https://www.googleapis.com/urlshortener/v1/url --header 'Content-Type: application/json' --data "{'longUrl': '$DLNAME'}" | grep \"id\" | sed -e 's,^.*id": ",,' -e 's/",.*$//'
-	echo 1>&-
 	
-	SHORTURL=$(grep "http" ../$MREV-$PLATFORM-$CARRIER"-version.txt" | sed s/$MUXEDNAMELONG,$FILESIZE,//g)
-	exec 1>>../url/aurlstats-$CURDATE.sh 2>&1
-	##echo "curl -s 'https://www.googleapis.com/urlshortener/v1/url?shortUrl="$SHORTURL"&projection=FULL' | grep -m2 \"shortUrlClicks\|\\\"longUrl\\\"\""
-	echo "echo "$MREV-$PLATFORM-$CARRIER
-	echo "curl -s 'https://www.googleapis.com/urlshortener/v1/url?shortUrl="$SHORTURL"&projection=FULL' | grep -m1 \"shortUrlClicks\""
-	echo 1>&-
-	chmod 0777 ../url/aurlstats-$CURDATE.sh
-	sed -i 's,http://ktoonsez.jonathanjsimon.com/sgs5/'$PLATFORM'/'$MUXEDNAMESHRT','"[B]"$CURDATE":[/B] [url]"$SHORTURL'[/url],' ../url/SERVERLINKS.txt
-
 	cd $KERNELDIR
 else
 	echo "KERNEL DID NOT BUILD! no zImage-dtb exist"
