@@ -1,4 +1,5 @@
 #!/bin/sh
-export CARRIER="900F"
-export ADD_KTWEAKER="Y"
+export CARRIER="KLTE"
+export EXEC_LOKI="N"
+echo "### All-in-One BUILD ###"
 ./build_master.sh
