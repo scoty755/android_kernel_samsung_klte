@@ -59,7 +59,7 @@ echo "Make the kernel"
 make msm8974_sec_defconfig VARIANT_DEFCONFIG=msm8974pro_sec_klte_eur_defconfig SELINUX_DEFCONFIG=selinux_defconfig
 
 echo "Modding .config file - "$KTVER
-sed -i 's,CONFIG_LOCALVERSION="-KT-SGS5",CONFIG_LOCALVERSION="'$KTVER'",' .config
+sed -i 's,CONFIG_LOCALVERSION="-ChronicKernel",CONFIG_LOCALVERSION="'$KTVER'",' .config
 
 if [ "$RLSVER" != "" ]; then
 echo "Release version number set - disabling LOCALVERSION_AUTO"
