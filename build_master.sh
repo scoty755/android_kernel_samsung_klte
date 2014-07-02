@@ -8,7 +8,7 @@ else
 export MUXEDNAMELONG="ChronicKernel-$MREV-$PLATFORM-$BOARD-$CURDATE"
 fi
 export MUXEDNAMESHRT="ChronicKernel-$MREV-$PLATFORM-$BOARD*"
-export KTVER="--$MUXEDNAMELONG--"
+export KTVER="-$MUXEDNAMELONG"
 export SRC_ROOT=`readlink -f ../../..`
 export KERNELDIR=`readlink -f .`
 export PARENT_DIR=`readlink -f ..`
