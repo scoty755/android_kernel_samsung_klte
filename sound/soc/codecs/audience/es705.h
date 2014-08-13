@@ -474,7 +474,7 @@ enum {
  * Default delay before switch to sleep - 2sec
  * To change delay value use SYSFS sleep delay entry
  */
-#define ES705_SLEEP_DEFAULT_DELAY 2000
+#define ES705_SLEEP_DEFAULT_DELAY 0
 
 #if defined(PREVENT_CALL_MUTE_WHEN_SWITCH_NB_AND_WB)
 #define ES705_REROUTE_INV 200
@@ -624,3 +624,4 @@ extern u32 es705_streaming_cmds[];
 #define ES705_STREAM_ENABLE	1
 
 #endif /* _ES705_H */
+
