@@ -137,7 +137,7 @@ CONFIG_IIO_ST_HWMON=y
 #
 # NFC
 #
-CONFIG_BCM2079X_NFC_I2C=y
+# CONFIG_BCM2079X_NFC_I2C is not set
 #
 # Battery & Charger
 #
