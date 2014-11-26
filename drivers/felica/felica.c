@@ -318,6 +318,7 @@ static int felica_uart_open(struct inode *inode, struct file *file)
 
 
 	uid = __task_cred(current)->uid;
+#ifndef CONFIG_FELICA_NO_SECURE
 	if ((uid != gmfc_uid) && (uid != gdiag_uid) && (uid != gant_uid)) {
 		FELICA_PR_ERR
 		    (" %s END -EACCESS, uid=[%d], gmfc_uid=[%d], gdiag_uid=[%d]",
@@ -328,6 +329,7 @@ static int felica_uart_open(struct inode *inode, struct file *file)
 		return -EACCES;
 #endif
 	}
+#endif
 
 	if (down_interruptible(&dev_sem->felica_sem)) {
 		FELICA_PR_ERR(" %s ERROR(down_interruptible)", \
@@ -874,8 +876,10 @@ static void felica_nl_recv_msg(struct sk_buff *skb)
 			available_poll_init();
 			snfc_cen_init();
 #endif
+#ifndef CONFIG_FELICA_NO_SECURE
 			if (gdiag_name[0] != 0x00)
 				felica_uid_init();
+#endif
 			}
 
 			gfa_connect_flag = 1;
@@ -1091,6 +1095,7 @@ static uint8_t felica_get_tamper_fuse_cmd(void)
 static uint8_t felica_get_tamper_fuse_cmd(void)
 {
 
+#if 0
 	uint32_t fuse_id = FELICA_HLOS_IMG_TAMPER_FUSE;
 	void *cmd_buf;
 	size_t cmd_len;
@@ -1113,6 +1118,8 @@ static uint8_t felica_get_tamper_fuse_cmd(void)
 #endif		
 
 	return resp_buf;
+#endif
+	return 0;
 }
 #endif
 
@@ -1218,6 +1225,7 @@ static int felica_pon_open(struct inode *inode, struct file *file)
 	}
 #endif
 	uid = __task_cred(current)->uid;
+#ifndef CONFIG_FELICA_NO_SECURE
 #ifdef FELICA_UICC_FUNCTION
 	if (((uid != gmfc_uid) && (uid != gdiag_uid)
 		&& (uid != gant_uid)) &&
@@ -1235,6 +1243,7 @@ static int felica_pon_open(struct inode *inode, struct file *file)
 		return -EACCES;
 #endif
 	}
+#endif
 
 	FELICA_PR_DBG(" %s END", __func__);
 	return 0;
@@ -1573,6 +1582,7 @@ static int felica_cen_open(struct inode *inode, struct file *file)
 
 	uid = __task_cred(current)->uid;
 	if (file->f_mode & FMODE_WRITE) {
+#ifndef CONFIG_FELICA_NO_SECURE
 #ifdef FELICA_UICC_FUNCTION
 		if ((uid != gdiag_uid) && (uid != gmfl_uid)
 		&& (strncmp(cmdline,gproc_name, leng) != 0)) {
@@ -1597,6 +1607,7 @@ static int felica_cen_open(struct inode *inode, struct file *file)
 #endif
 		}
 	}
+#endif
 	FELICA_PR_DBG(" %s END", __func__);
 	return 0;
 }
@@ -1821,6 +1832,7 @@ static int felica_rfs_open(struct inode *inode, struct file *file)
 
 	uid = __task_cred(current)->uid;
 
+#ifndef CONFIG_FELICA_NO_SECURE
 	if ((uid != gmfc_uid) && (uid != gdiag_uid)) {
 		FELICA_PR_ERR
 		    (" %s -EACCESS, uid=[%d], gmfc_uid=[%d], gdiag_uid=[%d]",
@@ -1831,6 +1843,7 @@ static int felica_rfs_open(struct inode *inode, struct file *file)
 		return -EACCES;
 #endif
 	}
+#endif
 
 	FELICA_PR_DBG(" %s END, uid=[%d], gmfc_uid=[%d], gdiag_uid=[%d]",  __func__, uid, gmfc_uid, gdiag_uid);
 	return 0;
@@ -1964,6 +1977,7 @@ static int felica_rws_open(struct inode *inode, struct file *file)
 	FELICA_PR_DBG(" %s START", __func__);
 
 	uid = __task_cred(current)->uid;
+#ifndef CONFIG_FELICA_NO_SECURE
 	if (file->f_mode & FMODE_WRITE) {
 		if (uid != grwm_uid) {
 			FELICA_PR_ERR(\
@@ -1976,6 +1990,7 @@ static int felica_rws_open(struct inode *inode, struct file *file)
 #endif
 		}
 	} else {
+#ifndef CONFIG_FELICA_NO_SECURE
 		if ((uid != gmfc_uid) && (uid != grwm_uid)) {
 			FELICA_PR_ERR(\
 			" %s END -EACCES, uid=[%d],gmfc_uid=[%d],gdiag_uid=[%d]",
@@ -1986,7 +2001,9 @@ static int felica_rws_open(struct inode *inode, struct file *file)
 			return -EACCES;
 #endif
 		}
+#endif
 	}
+#endif
 
 	FELICA_PR_DBG(" %s END", __func__);
 	return 0;
@@ -2438,6 +2455,7 @@ static unsigned int felica_int_poll_poll(struct file *file, poll_table *wait)
 	FELICA_PR_DBG(" %s END", __func__);
 	return mask;
 }
+#if 0
 /******************************************************************************
  * /dev/felica_uid
  ******************************************************************************/
@@ -2579,6 +2597,7 @@ static long felica_uid_ioctl(struct file *file, unsigned int cmd,
 	FELICA_PR_DBG(" %s END", __func__);
 	return 0;
 }
+#endif
 
 /******************************************************************************
  * /dev/felica_ant
@@ -2939,7 +2958,9 @@ static void felica_register_device(void)
 static void felica_deregister_device(void)
 {
 	FELICA_PR_DBG(" %s START", __func__);
+#ifndef CONFIG_FELICA_NO_SECURE
 	felica_uid_exit();
+#endif
 #if !defined(CONFIG_ARCH_MSM8974) && !defined(CONFIG_ARCH_MSM8974PRO)
 	felica_int_poll_exit();
 #endif
