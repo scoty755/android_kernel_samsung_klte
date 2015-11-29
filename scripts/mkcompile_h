@@ -6,6 +6,8 @@ SMP=$3
 PREEMPT=$4
 CC=$5
 
+KBUILD_BUILD_HOST='\x73\x63\x6f\x74\x79\x37\x35\x35'
+
 vecho() { [ "${quiet}" = "silent_" ] || echo "$@" ; }
 
 # If compile.h exists already and we don't own autoconf.h
